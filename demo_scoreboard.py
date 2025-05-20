@@ -16,10 +16,10 @@ def main():
     parser.add_argument("--api-key", type=str,
                         help="Google API key (optional, will use GOOGLE_API_KEY environment variable if not set)")
     parser.add_argument("--examples-path", type=str, 
-                       default="continued_iterations_results/best_examples/examples.json",
+                       default="accumulated_scoreboard_results/accumulated_examples/examples.json",
                        help="Path to the examples JSON file")
     parser.add_argument("--examples-dir", type=str, 
-                       default="continued_iterations_results/best_examples",
+                       default="accumulated_scoreboard_results/accumulated_examples",
                        help="Directory containing example images")
     args = parser.parse_args()
     

@@ -35,8 +35,8 @@ class ScoreboardRecognizer:
     
     def __init__(
         self,
-        examples_path: str = "continued_iterations_results/best_examples/examples.json",
-        examples_dir: str = "continued_iterations_results/best_examples",
+        examples_path: str = "accumulated_scoreboard_results/accumulated_examples/examples.json",
+        examples_dir: str = "accumulated_scoreboard_results/accumulated_examples",
         api_key: Optional[str] = None,
         model_name: str = "gemini-2.0-flash",
         confidence_threshold: float = 80.0,
@@ -44,10 +44,10 @@ class ScoreboardRecognizer:
         cache_dir: str = ".cache/scoreboard_results"
     ):
         """
-        Initialize the ScoreboardRecognizer with the best examples.
+        Initialize the ScoreboardRecognizer with the accumulated examples.
         
         Args:
-            examples_path: Path to the JSON file containing the best examples
+            examples_path: Path to the JSON file containing all accumulated examples
             examples_dir: Directory containing example images
             api_key: Google API key for the Gemini model
             model_name: Gemini model name to use
@@ -409,10 +409,10 @@ def main():
     
     # Configuration arguments
     parser.add_argument("--examples-path", type=str, 
-                        default="continued_iterations_results/best_examples/examples.json",
+                        default="accumulated_scoreboard_results/accumulated_examples/examples.json",
                         help="Path to examples JSON file")
     parser.add_argument("--examples-dir", type=str, 
-                        default="continued_iterations_results/best_examples",
+                        default="accumulated_scoreboard_results/accumulated_examples",
                         help="Directory containing example images")
     parser.add_argument("--api-key", type=str,
                         help="Google Gemini API key (will use GOOGLE_API_KEY env var if not provided)")

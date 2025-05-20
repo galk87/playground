@@ -1,0 +1,199 @@
+[
+  {
+    "image_id": "9538",
+    "home_score": "bg0",
+    "away_score": "bg0",
+    "clock": "15:55",
+    "period": "1"
+  },
+  {
+    "image_id": "94333",
+    "home_score": "53",
+    "away_score": "29",
+    "clock": "20:22",
+    "period": "0"
+  },
+  {
+    "image_id": "1529",
+    "home_score": "33",
+    "away_score": "22",
+    "clock": "52:46",
+    "period": "2"
+  },
+  {
+    "image_id": "87576",
+    "home_score": "53",
+    "away_score": "29",
+    "clock": "20:22",
+    "period": "0"
+  },
+  {
+    "image_id": "776",
+    "home_score": "33",
+    "away_score": "22",
+    "clock": "54:02",
+    "period": "2"
+  },
+  {
+    "image_id": "13097",
+    "home_score": "22",
+    "away_score": "22",
+    "clock": "30:45",
+    "period": "2",
+    "for_mistake": "11957",
+    "similarity": 0.9976627826690674
+  },
+  {
+    "image_id": "13162",
+    "home_score": "22",
+    "away_score": "22",
+    "clock": "30:18",
+    "period": "2",
+    "for_mistake": "13159",
+    "similarity": 0.9974161386489868
+  },
+  {
+    "image_id": "11636",
+    "home_score": "22",
+    "away_score": "22",
+    "clock": "40:54",
+    "period": "2",
+    "for_mistake": "10492",
+    "similarity": 0.9963575005531311
+  },
+  {
+    "image_id": "13189",
+    "home_score": "22",
+    "away_score": "22",
+    "clock": "30:07",
+    "period": "2",
+    "for_mistake": "11206",
+    "similarity": 0.995561957359314
+  },
+  {
+    "image_id": "11528",
+    "home_score": "22",
+    "away_score": "22",
+    "clock": "41:39",
+    "period": "2",
+    "for_mistake": "11576",
+    "similarity": 0.9964162707328796
+  },
+  {
+    "image_id": "11791",
+    "home_score": "82",
+    "away_score": "22",
+    "clock": "39:49",
+    "period": "2",
+    "for_mistake": "9769",
+    "similarity": 0.9983379244804382
+  },
+  {
+    "image_id": "12841",
+    "home_score": "22",
+    "away_score": "22",
+    "clock": "32:32",
+    "period": "2",
+    "for_mistake": "12418",
+    "similarity": 0.9979119896888733
+  },
+  {
+    "image_id": "4043",
+    "home_score": "33",
+    "away_score": "22",
+    "clock": "48:35",
+    "period": "2",
+    "for_mistake": "4008",
+    "similarity": 0.9973843097686768
+  },
+  {
+    "image_id": "13073",
+    "home_score": "22",
+    "away_score": "22",
+    "clock": "30:55",
+    "period": "2",
+    "for_mistake": "11206",
+    "similarity": 0.9953455924987793
+  },
+  {
+    "image_id": "11553",
+    "home_score": "22",
+    "away_score": "22",
+    "clock": "41:28",
+    "period": "2",
+    "for_mistake": "11576",
+    "similarity": 0.9963291883468628
+  },
+  {
+    "image_id": "12383",
+    "home_score": "22",
+    "away_score": "22",
+    "clock": "35:42",
+    "period": "2",
+    "for_mistake": "9769",
+    "similarity": 0.9938548803329468
+  },
+  {
+    "image_id": "5012",
+    "home_score": "33",
+    "away_score": "22",
+    "clock": "46:58",
+    "period": "2",
+    "for_mistake": "4008",
+    "similarity": 0.9969305992126465
+  },
+  {
+    "image_id": "3907",
+    "home_score": "33",
+    "away_score": "22",
+    "clock": "48:48",
+    "period": "2",
+    "for_mistake": "4008",
+    "similarity": 0.9968969821929932
+  },
+  {
+    "image_id": "10947",
+    "home_score": "22",
+    "away_score": "22",
+    "clock": "45:41",
+    "period": "2",
+    "for_mistake": "13159",
+    "similarity": 0.9964570999145508
+  },
+  {
+    "image_id": "10131",
+    "home_score": "22",
+    "away_score": "22",
+    "clock": "51:21",
+    "period": "2",
+    "for_mistake": "11206",
+    "similarity": 0.9950481057167053
+  },
+  {
+    "image_id": "95719",
+    "home_score": "53",
+    "away_score": "29",
+    "clock": "20:22",
+    "period": "0",
+    "for_mistake": "110112",
+    "similarity": 0.9984649419784546
+  },
+  {
+    "image_id": "3904",
+    "home_score": "33",
+    "away_score": "22",
+    "clock": "48:49",
+    "period": "2",
+    "for_mistake": "4008",
+    "similarity": 0.9965585470199585
+  },
+  {
+    "image_id": "120061",
+    "home_score": "53",
+    "away_score": "29",
+    "clock": "20:22",
+    "period": "0",
+    "for_mistake": "80070",
+    "similarity": 0.9965426921844482
+  }
+]
