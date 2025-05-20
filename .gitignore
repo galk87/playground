@@ -1,0 +1,56 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+ENV/
+
+# Logs
+*.log
+logs/
+
+# Cache directories
+.cache/
+.pytest_cache/
+
+# Results and data
+*_results/
+!continued_iterations_results/best_examples/
+*_result.json
+batch_results.json
+test_images.txt
+results.json
+single_result.json
+
+# Training data (keep only the necessary examples)
+combined_valid_dataset/
+unified_dataset/
+
+# Editor files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS files
+.DS_Store
+Thumbs.db 

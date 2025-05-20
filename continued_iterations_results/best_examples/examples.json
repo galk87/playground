@@ -1,0 +1,47 @@
+[
+  {
+    "image_id": "11528",
+    "home_score": "22",
+    "away_score": "22",
+    "clock": "41:39",
+    "period": "2",
+    "for_mistake": "12862",
+    "similarity": 0.9972264766693115
+  },
+  {
+    "image_id": "11791",
+    "home_score": "82",
+    "away_score": "22",
+    "clock": "39:49",
+    "period": "2",
+    "for_mistake": "9769",
+    "similarity": 0.9983379244804382
+  },
+  {
+    "image_id": "12841",
+    "home_score": "22",
+    "away_score": "22",
+    "clock": "32:32",
+    "period": "2",
+    "for_mistake": "12418",
+    "similarity": 0.9979119896888733
+  },
+  {
+    "image_id": "4043",
+    "home_score": "33",
+    "away_score": "22",
+    "clock": "48:35",
+    "period": "2",
+    "for_mistake": "4008",
+    "similarity": 0.9973843097686768
+  },
+  {
+    "image_id": "13097",
+    "home_score": "22",
+    "away_score": "22",
+    "clock": "30:45",
+    "period": "2",
+    "for_mistake": "11964",
+    "similarity": 0.9969590902328491
+  }
+]
