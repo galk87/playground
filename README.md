@@ -15,6 +15,7 @@ This is a production-ready system for extracting scoreboards from basketball gam
 - **Parallel Processing**: Supports batch processing with configurable parallelism
 - **Result Caching**: Automatically caches results to avoid redundant API calls
 - **Comprehensive Logging**: Detailed logging for production environments
+- **Text-Only Mode**: Option to use text descriptions instead of images for examples, reducing API costs
 
 ## Installation
 
@@ -61,16 +62,29 @@ python scoreboard_recognition.py --image-dir path/to/images/ \
   --verbose
 ```
 
+#### Text-only mode (no images in examples):
+
+```bash
+python scoreboard_recognition.py --image path/to/image.jpg --use-images False
+```
+
 ### Using as a Python Library
 
 ```python
 from scoreboard_recognition import ScoreboardRecognizer
 
-# Initialize the recognizer
+# Initialize the recognizer with image-based examples
 recognizer = ScoreboardRecognizer(
     examples_path="continued_iterations_results/accumulated_examples/examples.json",
     examples_dir="continued_iterations_results/accumulated_examples",
     api_key="your_api_key_here"  # Optional if set in environment
+)
+
+# Initialize with text-only examples
+text_only_recognizer = ScoreboardRecognizer(
+    examples_path="continued_iterations_results/accumulated_examples/examples.json",
+    examples_dir="continued_iterations_results/accumulated_examples",
+    use_images=False  # Enable text-only mode
 )
 
 # Process a single image
@@ -109,7 +123,9 @@ With the accumulated examples from all iterations, the performance is further im
 
 1. **Image-Based Few-Shot Learning**: The system uses 23 carefully selected example images with their correct labels to teach the model how to extract scoreboard information.
 
-2. **Iterative Similarity Selection with Accumulated Examples**: The examples were selected through an iterative process that:
+2. **Text-Only Mode**: When enabled, the system uses text descriptions of the examples instead of actual images, which can reduce API costs while maintaining good accuracy.
+
+3. **Iterative Similarity Selection with Accumulated Examples**: The examples were selected through an iterative process that:
    - Tests the model on validation images
    - Identifies mistakes
    - Finds training images similar to the mistakes
@@ -117,7 +133,7 @@ With the accumulated examples from all iterations, the performance is further im
    - Repeats until performance plateaus
    - Saves all unique examples across all iterations
 
-3. **Confidence Scoring**: The model provides confidence scores for each extracted field, allowing applications to handle low-confidence predictions appropriately.
+4. **Confidence Scoring**: The model provides confidence scores for each extracted field, allowing applications to handle low-confidence predictions appropriately.
 
 ## Customization
 
@@ -150,6 +166,7 @@ python scoreboard_recognition.py --model gemini-2.0-pro
 - The system is optimized for basketball scoreboards in the style present in the training data
 - Performance may vary on significantly different scoreboard designs
 - API calls to Gemini have associated costs and rate limits
+- Text-only mode may have slightly lower accuracy than image-based mode but offers cost savings
 
 ## License
 

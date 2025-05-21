@@ -41,7 +41,8 @@ class ScoreboardRecognizer:
         model_name: str = "gemini-2.0-flash",
         confidence_threshold: float = 80.0,
         cache_results: bool = True,
-        cache_dir: str = ".cache/scoreboard_results"
+        cache_dir: str = ".cache/scoreboard_results",
+        use_images: bool = True
     ):
         """
         Initialize the ScoreboardRecognizer with the accumulated examples.
@@ -54,6 +55,7 @@ class ScoreboardRecognizer:
             confidence_threshold: Minimum confidence score to accept a prediction
             cache_results: Whether to cache results to avoid redundant API calls
             cache_dir: Directory to store cache files
+            use_images: Whether to include images in the examples (False for text-only mode)
         """
         # Configure API
         self.api_key = api_key or os.environ.get("GOOGLE_API_KEY")
@@ -72,6 +74,7 @@ class ScoreboardRecognizer:
         # Settings
         self.confidence_threshold = confidence_threshold
         self.cache_results = cache_results
+        self.use_images = use_images
         
         # Setup cache
         if cache_results:
@@ -179,20 +182,26 @@ class ScoreboardRecognizer:
         
         # Add each example
         for i, example in enumerate(self.examples, 1):
-            image_id = example["image_id"]
-            example_image_path = os.path.join(self.examples_dir, f"example_{image_id}.jpg")
-            
-            if not os.path.exists(example_image_path):
-                logger.warning(f"Example image {image_id} not found, skipping")
-                continue
-            
-            # Add example
-            content.append(f"Example #{i}\nInput: ")
-            img = self._load_image(example_image_path)
-            if img:
-                content.append(img)
+            if self.use_images:
+                # Image-based example
+                image_id = example["image_id"]
+                example_image_path = os.path.join(self.examples_dir, f"example_{image_id}.jpg")
+                
+                if not os.path.exists(example_image_path):
+                    logger.warning(f"Example image {image_id} not found, skipping")
+                    continue
+                
+                # Add example
+                content.append(f"Example #{i}\nInput: ")
+                img = self._load_image(example_image_path)
+                if img:
+                    content.append(img)
+                else:
+                    continue
             else:
-                continue
+                # Text-only example
+                content.append(f"Example #{i}")
+                content.append(f"Input: A basketball scoreboard showing home score {example['home_score']}, away score {example['away_score']}, clock at {example['clock']}, and period {example['period']}")
             
             # Add expected output
             content.append("\nOutput:\n```json\n")
@@ -209,7 +218,7 @@ class ScoreboardRecognizer:
                 }
             }
             content.append(json.dumps(output, indent=2))
-            content.append("\n```\n\n")
+            content.append("\n```\n")
         
         # Add test instructions
         content.append("\nNow analyze this new scoreboard image and extract the information in JSON format.\n")
@@ -218,73 +227,25 @@ class ScoreboardRecognizer:
         # Add test image
         test_img = self._load_image(image_path)
         if not test_img:
-            return {
-                "error": f"Could not load test image: {image_path}",
-                "success": False
-            }
+            raise ValueError(f"Could not load test image: {image_path}")
         content.append(test_img)
         
-        # Call the model
-        start_time = time.time()
-        try:
-            response = self.model.generate_content(content)
-            
-            # Process the response
-            if hasattr(response, 'text'):
-                raw_response = response.text
-            else:
-                raw_response = str(response)
-            
-            # Extract JSON from response
-            extraction = self._extract_json_from_response(raw_response)
-            inference_time = time.time() - start_time
-            
-            # Create result object
-            if extraction:
-                result = {
-                    "success": True,
-                    "home_score": extraction.get("home_score"),
-                    "away_score": extraction.get("away_score"),
-                    "clock": extraction.get("clock"),
-                    "period": extraction.get("period"),
-                    "confidence": extraction.get("confidence", {}),
-                    "inference_time": inference_time,
-                }
-                
-                # Check if confidence is high enough
-                confidences = extraction.get("confidence", {})
-                low_confidence_fields = []
-                
-                for field in ["home_score", "away_score", "clock", "period"]:
-                    confidence = confidences.get(field, 0)
-                    if confidence < self.confidence_threshold:
-                        low_confidence_fields.append(field)
-                
-                if low_confidence_fields:
-                    result["warnings"] = f"Low confidence for fields: {', '.join(low_confidence_fields)}"
-            else:
-                result = {
-                    "success": False,
-                    "error": "Could not extract JSON from model response",
-                    "inference_time": inference_time,
-                }
-            
-            # Include raw output if requested
-            if return_raw_output:
-                result["raw_output"] = raw_response
-            
-            # Cache the result
-            self._save_to_cache(image_path, result)
-            
-            return result
+        # Run the model
+        response = self.model.generate_content(content)
         
-        except Exception as e:
-            logger.error(f"Error during inference: {e}")
-            return {
-                "success": False,
-                "error": str(e),
-                "inference_time": time.time() - start_time
-            }
+        # Extract JSON from response
+        extraction = self._extract_json_from_response(response.text)
+        if not extraction:
+            extraction = {"raw_response": response.text}
+        
+        # Add raw output if requested
+        if return_raw_output:
+            extraction["raw_output"] = response.text
+        
+        # Cache the result
+        self._save_to_cache(image_path, extraction)
+        
+        return extraction
     
     def batch_extract(
         self, 
@@ -398,48 +359,41 @@ class ScoreboardRecognizer:
 
 
 def main():
-    """Main function to run as a command-line tool."""
-    parser = argparse.ArgumentParser(description="Extract scoreboard information from basketball images")
-    
-    # Main arguments
-    parser.add_argument("--image", type=str, help="Path to a single image for processing")
-    parser.add_argument("--image-dir", type=str, help="Directory containing images for batch processing")
-    parser.add_argument("--output", type=str, default="scoreboard_results.json", 
-                        help="Output file for results (default: scoreboard_results.json)")
-    
-    # Configuration arguments
-    parser.add_argument("--examples-path", type=str, 
-                        default="accumulated_scoreboard_results/accumulated_examples/examples.json",
-                        help="Path to examples JSON file")
-    parser.add_argument("--examples-dir", type=str, 
-                        default="accumulated_scoreboard_results/accumulated_examples",
-                        help="Directory containing example images")
-    parser.add_argument("--api-key", type=str,
-                        help="Google Gemini API key (will use GOOGLE_API_KEY env var if not provided)")
-    parser.add_argument("--model", type=str, default="gemini-2.0-flash",
-                        help="Model name to use (default: gemini-2.0-flash)")
+    """Main function for command-line usage."""
+    parser = argparse.ArgumentParser(description="Extract scoreboard information from basketball game images")
+    parser.add_argument("--image", type=str, help="Path to a single image file")
+    parser.add_argument("--image-dir", type=str, help="Directory containing images to process")
+    parser.add_argument("--output", type=str, help="Output JSON file for batch processing")
+    parser.add_argument("--examples-path", type=str, default="accumulated_scoreboard_results/accumulated_examples/examples.json",
+                      help="Path to examples JSON file")
+    parser.add_argument("--examples-dir", type=str, default="accumulated_scoreboard_results/accumulated_examples",
+                      help="Directory containing example images")
+    parser.add_argument("--api-key", type=str, help="Google API key (defaults to GOOGLE_API_KEY environment variable)")
+    parser.add_argument("--model", type=str, default="gemini-2.0-flash", help="Gemini model to use")
+    parser.add_argument("--max-workers", type=int, default=1, help="Maximum number of parallel workers for batch processing")
     parser.add_argument("--confidence-threshold", type=float, default=80.0,
-                        help="Minimum confidence score to accept (default: 80.0)")
-    
-    # Batch processing arguments
-    parser.add_argument("--file-pattern", type=str, default="*.jpg,*.png,*.jpeg",
-                        help="File pattern(s) for batch processing (comma-separated, default: *.jpg,*.png,*.jpeg)")
-    parser.add_argument("--max-workers", type=int, default=1,
-                        help="Maximum number of parallel workers for batch processing (default: 1)")
-    parser.add_argument("--no-cache", action="store_true",
-                        help="Disable caching of results")
-    parser.add_argument("--cache-dir", type=str, default=".cache/scoreboard_results",
-                        help="Directory to store cached results")
-    parser.add_argument("--verbose", action="store_true",
-                        help="Enable verbose logging")
+                      help="Minimum confidence score to accept a prediction")
+    parser.add_argument("--file-pattern", type=str, default="*.jpg,*.png",
+                      help="Comma-separated list of file patterns to process")
+    parser.add_argument("--no-cache", action="store_true", help="Disable result caching")
+    parser.add_argument("--verbose", action="store_true", help="Enable verbose logging")
+    parser.add_argument("--use-images", action="store_true", default=True,
+                      help="Use images in examples (set to False for text-only mode)")
     
     args = parser.parse_args()
     
-    # Set logging level
+    # Configure logging
     if args.verbose:
         logger.setLevel(logging.DEBUG)
     
-    # Initialize the recognizer
+    # Validate arguments
+    if not args.image and not args.image_dir:
+        parser.error("Either --image or --image-dir must be specified")
+    
+    if args.image_dir and not args.output:
+        parser.error("--output must be specified when using --image-dir")
+    
+    # Initialize recognizer
     recognizer = ScoreboardRecognizer(
         examples_path=args.examples_path,
         examples_dir=args.examples_dir,
@@ -447,58 +401,26 @@ def main():
         model_name=args.model,
         confidence_threshold=args.confidence_threshold,
         cache_results=not args.no_cache,
-        cache_dir=args.cache_dir
+        use_images=args.use_images
     )
     
-    # Process based on arguments
+    # Process single image
     if args.image:
-        # Single image processing
-        logger.info(f"Processing single image: {args.image}")
         result = recognizer.extract_scoreboard(args.image, return_raw_output=args.verbose)
-        
-        # Save the result
-        with open(args.output, 'w') as f:
-            json.dump(result, f, indent=2)
-        
-        # Display result
-        if result.get("success", False):
-            print(f"\nScoreboard information extracted successfully:")
-            print(f"Home Score: {result.get('home_score', 'N/A')} ({result.get('confidence', {}).get('home_score', 'N/A')}%)")
-            print(f"Away Score: {result.get('away_score', 'N/A')} ({result.get('confidence', {}).get('away_score', 'N/A')}%)")
-            print(f"Clock: {result.get('clock', 'N/A')} ({result.get('confidence', {}).get('clock', 'N/A')}%)")
-            print(f"Period: {result.get('period', 'N/A')} ({result.get('confidence', {}).get('period', 'N/A')}%)")
-            print(f"Inference Time: {result.get('inference_time', 'N/A'):.2f}s")
-            
-            if "warnings" in result:
-                print(f"Warnings: {result['warnings']}")
-        else:
-            print(f"\nFailed to extract scoreboard information:")
-            print(f"Error: {result.get('error', 'Unknown error')}")
-        
-        print(f"\nResult saved to {args.output}")
+        print(json.dumps(result, indent=2))
+        return
     
-    elif args.image_dir:
-        # Batch processing
-        logger.info(f"Processing images in directory: {args.image_dir}")
-        results, success_count, total_count = recognizer.extract_and_save_batch(
+    # Process directory
+    if args.image_dir:
+        results, total, processed = recognizer.extract_and_save_batch(
             image_dir=args.image_dir,
             output_file=args.output,
             file_pattern=args.file_pattern,
-            max_workers=args.max_workers,
-            show_progress=True
+            max_workers=args.max_workers
         )
-        
-        # Display summary
-        print(f"\nBatch processing complete:")
-        print(f"Processed {total_count} images")
-        if total_count > 0:
-            print(f"Success rate: {success_count}/{total_count} ({success_count/total_count*100:.1f}%)")
-            print(f"Results saved to {args.output}")
-        else:
-            print("No images were processed.")
-    
-    else:
-        parser.print_help()
+        print(f"\nProcessed {processed}/{total} images")
+        print(f"Results saved to {args.output}")
+        return
 
 if __name__ == "__main__":
     main() 
