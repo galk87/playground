@@ -99,6 +99,46 @@ image_paths = ["image1.jpg", "image2.jpg", "image3.jpg"]
 results = recognizer.batch_extract(image_paths, max_workers=3)
 ```
 
+### Processing Videos with Dynamic Scoreboard Description
+
+A new script `process_video_rectified.py` is available to process video files. It samples frames, extracts scoreboard information, and creates an output video with the data overlaid. A key feature is its ability to **dynamically generate a description of the scoreboard layout** from the first frame of the video, making it adaptable to different scoreboard designs without manual prompting for each video.
+
+It also uses the previously recognized frame's data as a strong hint for the current frame, improving temporal consistency.
+
+#### Basic Video Processing:
+
+```bash
+python process_video_rectified.py --input-video path/to/your_video.mp4 --output-video path/to/output_video.mp4 --api-key YOUR_API_KEY
+```
+
+#### Advanced Video Processing Options:
+
+This script utilizes the `ScoreboardRecognizer` internally and shares some of its arguments (like `--model`, `--examples-path`, etc.). Key arguments specific to or important for `process_video_rectified.py` include:
+
+- `--input-video <path>`: Path to the input video file (default: `rectified_output.mp4`).
+- `--output-video <path>`: Path to save the output video with overlaid results (required).
+- `--api-key <key>`: Your Google API key (can also be set via `GOOGLE_API_KEY` environment variable).
+- `--model <model_name>`: Gemini model for scoreboard data extraction (default: `gemini-1.5-flash-latest`).
+- `--description-model <model_name>`: Gemini model for dynamic scoreboard description generation (default: `gemini-1.5-flash-latest`).
+- `--max-processing-time <seconds>`: Process only the first N seconds of the video (e.g., `20.0`). Default is to process the full video.
+- `--temporal-context-prompt "Your prompt text"`: Custom prompt to explain temporal consistency to the model when using the previous frame as a guide. A default prompt is provided.
+- `--desc-example-image-path <path>`: Path to an example image (e.g., `test_data/frame_0.jpg`) to guide the dynamic scoreboard description generation task. 
+- `--desc-example-text "Textual description"`: The known textual description corresponding to the `--desc-example-image-path`. Both this and the image path must be provided if one is used.
+
+Example with dynamic description guidance and processing the first 30 seconds:
+
+```bash
+python process_video_rectified.py \
+    --input-video example_game.mp4 \
+    --output-video processed_game_30s.mp4 \
+    --api-key YOUR_API_KEY \
+    --model gemini-1.5-flash-latest \
+    --description-model gemini-1.5-flash-latest \
+    --max-processing-time 30.0 \
+    --desc-example-image-path "test_data/frame_0.jpg" \
+    --desc-example-text "Home score top-left, away top-right, clock bottom-center."
+```
+
 ### Demo Script
 
 For a simple demonstration, use the demo script:
